@@ -100,7 +100,6 @@ ORDER BY
 # Important Notes for Querying
 1. Date Functions: Use EXTRACT(YEAR FROM date_column) and EXTRACT(MONTH FROM date_column) for year and month extraction to ensure compatibility across different SQL dialects.
 1. String Concatenation: Use CONCAT() function or the || operator (depending on your SQL dialect) for string concatenation.
-1. Test Users: Always exclude test users in your queries unless specifically told to include them. Use a LEFT JOIN with the test_users table and filter where tu.user_id IS NULL.
 1. Coupon Payments: Unless specified otherwise, exclude payments made with coupons in spend calculations.
 1. Date Ranges: When filtering for post-GA data, use order_date >= '2024-01-01' in your WHERE clause.
 1. Orders Without Line Items: For orders that exist but have no associated line items, assume they're associated with line_item_id = 1. Use COALESCE(oli.line_item_id, 1) when joining with the order_line_items table. When we first launched, we only had one product (our standard plan) and we didn’t need to track individual line items within an order. Therefore, when you see an order without any associated line items it’s safe to assume that it’s a standard plan order.
