@@ -57,7 +57,7 @@ WITH order_revenue AS (
         o.id AS order_id,
         o.order_date,
         COALESCE(oli.line_item_id, 1) AS line_item_id,
-        COALESCE(oli.cost, p.amount) AS revenue
+        COALESCE(oli.price, p.amount) AS revenue
     FROM
         jaffle_shop.orders o
     LEFT JOIN
@@ -103,5 +103,5 @@ ORDER BY
 1. Coupon Payments: Unless specified otherwise, exclude payments made with coupons in spend calculations.
 1. Date Ranges: When filtering for post-GA data, use order_date >= '2024-01-01' in your WHERE clause.
 1. Orders Without Line Items: For orders that exist but have no associated line items, assume they're associated with line_item_id = 1. Use COALESCE(oli.line_item_id, 1) when joining with the order_line_items table. When we first launched, we only had one product (our standard plan) and we didn’t need to track individual line items within an order. Therefore, when you see an order without any associated line items it’s safe to assume that it’s a standard plan order.
-1. Revenue Calculation: When calculating revenue, use COALESCE(oli.cost, p.amount) to account for orders with and without line items.
+1. Revenue Calculation: When calculating revenue, use COALESCE(oli.price, p.amount) to account for orders with and without line items.
 1. Data Types: Be aware of the data types in each column and use appropriate type casting when necessary.
