@@ -31,8 +31,7 @@ ORDER BY
 ```
 sql
 SELECT
-    EXTRACT(YEAR FROM o.order_date) AS year,
-    EXTRACT(MONTH FROM o.order_date) AS month,
+    date_trunc('month', order_date) as order_month,
     COUNT(DISTINCT o.user_id) AS active_users
 FROM
     jaffle_shop.orders o
@@ -41,10 +40,9 @@ JOIN
 WHERE
     p.payment_method != 'coupon'
 GROUP BY
-    EXTRACT(YEAR FROM o.order_date),
-    EXTRACT(MONTH FROM o.order_date)
+    order_month
 ORDER BY
-    year, month;
+    order_month;
 ```
 
 ## Revenue by Line Item and Month
@@ -69,29 +67,23 @@ WITH order_revenue AS (
 ),
 monthly_revenue AS (
     SELECT
-        EXTRACT(YEAR FROM order_date) AS year,
-        EXTRACT(MONTH FROM order_date) AS month,
+        date_trunc('month', order_date) as order_month,
         line_item_id,
         SUM(revenue) AS revenue
     FROM
         order_revenue
     GROUP BY
-        EXTRACT(YEAR FROM order_date),
-        EXTRACT(MONTH FROM order_date),
+        order_month,
         line_item_id
 )
 SELECT
-    CONCAT(
-        CAST(year AS VARCHAR),
-        '-',
-        LPAD(CAST(month AS VARCHAR), 2, '0')
-    ) AS month,
+    order_month,
     line_item_id,
     revenue
 FROM
     monthly_revenue
 ORDER BY
-    year, month, line_item_id;
+    order_month, line_item_id;
 ```
 
 ## GA (General Availability)
