@@ -1,3 +1,45 @@
+# Tables
+
+## jaffle_shop.customers
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | jaffle_shop.orders.user_id |
+| first_name | TEXT | |
+| last_name | TEXT | |
+| created_at | DATE | |
+| billing_id | INT | |
+
+## jaffle_shop.orders
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | jaffle_shop.payments.order_id, jaffle_shop.order_line_items.order_id |
+| user_id | INT | jaffle_shop.customers.id |
+| order_date | DATE | |
+| status | TEXT | |
+
+## jaffle_shop.payments
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | |
+| order_id | INT | jaffle_shop.orders.id |
+| payment_method | TEXT | |
+| amount | DECIMAL | |
+
+**Note**: When calculating spend, always exclude coupons unless explicitly told to include them.
+
+## jaffle_shop.order_line_items
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| line_item_id | INT | |
+| order_id | INT | jaffle_shop.orders.id |
+| cost | DECIMAL | |
+
+## jaffle_shop.billable_entities
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| billing_id | INT | |
+| billable_status | BOOL | |
+
 # Key Business Definitions and Sample Queries
 
 ## Total Spend Per Customer
