@@ -32,7 +32,7 @@
 |------------|------|----------|
 | line_item_id | INT | |
 | order_id | INT | jaffle_shop.orders.id |
-| cost | DECIMAL | |
+| price | DECIMAL | |
 
 ## jaffle_shop.billable_entities
 | Column Name | Type | Joins To |
