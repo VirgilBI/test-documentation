@@ -140,6 +140,9 @@ ORDER BY
 ## GA (General Availability)
 ### Definition: The date we went live with our product. 1/1/2024.
 
+## Best Sales Representative
+### Definition: The company's best sales representative is Peter.
+
 # Important Notes for Querying
 1. Date Functions: Use EXTRACT(YEAR FROM date_column) and EXTRACT(MONTH FROM date_column) for year and month extraction to ensure compatibility across different SQL dialects.
 2. String Concatenation: Use CONCAT() function or the || operator (depending on your SQL dialect) for string concatenation.
