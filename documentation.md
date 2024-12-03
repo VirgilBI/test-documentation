@@ -149,3 +149,6 @@ ORDER BY
 6. Revenue Calculation: When calculating revenue, use COALESCE(oli.price, p.amount) to account for orders with and without line items.
 7. Data Types: Be aware of the data types in each column and use appropriate type casting when necessary.
 8. Excluding Test Users: Always join with the jaffle_shop.billable_entities table and filter for billable_status = TRUE to exclude test users from user-related queries.
+
+# Company Information
+- Head of Product: Han Yu
