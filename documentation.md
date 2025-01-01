@@ -25,8 +25,6 @@
 | payment_method | TEXT | |
 | amount | DECIMAL | |
 
-**Note**: When calculating spend, always exclude coupons unless explicitly told to include them.
-
 ## jaffle_shop.order_line_items
 | Column Name | Type | Joins To |
 |------------|------|----------|
