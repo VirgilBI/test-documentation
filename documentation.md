@@ -1,5 +1,3 @@
-are you reading this?
-
 # Tables
 
 ## jaffle_shop.customers
@@ -133,4 +131,5 @@ ORDER BY
 
 # Important Notes for Querying
 1. Coupon Payments: Unless specified otherwise, exclude payments made with coupons in spend calculations.
-1. Orders Without Line Items: For orders that exist but have no associated line items, assume they're associated with line_item_id = 1. Use COALESCE(oli.line_item_id, 1) when joining with the order_line_items table. When we first launched, we only had one product (our standard plan) and we didn’t need to track individual line items within an order. Therefore, when you see an order without any associated line items it’s safe to assume that it’s a standard plan order.
+2. Orders Without Line Items: For orders that exist but have no associated line items, assume they're associated with line_item_id = 1. Use COALESCE(oli.line_item_id, 1) when joining with the order_line_items table. When we first launched, we only had one product (our standard plan) and we didn't need to track individual line items within an order. Therefore, when you see an order without any associated line items it's safe to assume that it's a standard plan order.
+3. Line Items and Products: Each line item corresponds to a product. The line_item_id in the order_line_items table represents a specific product.
