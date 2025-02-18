@@ -7,7 +7,7 @@
 | first_name | TEXT | |
 | last_name | TEXT | |
 | created_at | DATE | |
-| billing_id | INT | |
+| billing_id | INT | jaffle_shop.billable_entities.billing_id |
 
 ## jaffle_shop.orders
 | Column Name | Type | Joins To |
@@ -35,7 +35,7 @@
 ## jaffle_shop.billable_entities
 | Column Name | Type | Joins To |
 |------------|------|----------|
-| billing_id | INT | |
+| billing_id | INT | jaffle_shop.customers.billing_id |
 | billable_status | BOOL | |
 
 # Historical events
@@ -46,4 +46,4 @@
 1. Coupon Payments: Unless specified otherwise, exclude payments made with coupons in spend calculations.
 2. Orders Without Line Items: For orders that exist but have no associated line items, assume they're associated with line_item_id = 1. Use COALESCE(oli.line_item_id, 1) when joining with the order_line_items table. When we first launched, we only had one product (our standard plan) and we didn't have a line_items table. Therefore, when you see an order without any associated line items it's safe to assume that it's a standard plan order.
 3. Line Items and Products: Each line item corresponds to a product. The line_item_id in the order_line_items table represents a specific product.
-
+4. Test Users: Exclude test users from queries about users. A test user is any user with billable_status = FALSE in the jaffle_shop.billable_entities table.
