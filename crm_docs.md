@@ -205,6 +205,5 @@ ORDER BY
    ```
 
    Only exclude this revenue if explicitly told to do so
-6. Monthly Queries: When querying the customer_recurring_revenue table on a monthly basis, use the filter 'WHERE dt = month_end_date' to summing across daily snapshots.
-7. A deal is considered a "Sales Qualified Opportunity" (SQO) if it has entered the deal_stage with value '145109412'. 
+6. Monthly Queries: When querying the customer_recurring_revenue table on a monthly basis, use the filter 'WHERE dt = month_end_date' to summing across daily snapshots. 
 
