@@ -38,6 +38,34 @@
 | billing_id | INT | |
 | billable_status | BOOL | |
 
+## salesloft.email
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| user_id | INT | |
+| recipient_id | INT | |
+| sent_at | TIMESTAMP | |
+
+## salesloft.people
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | |
+| account_id | INT | |
+| owner_id | INT | |
+| email_address | TEXT | |
+
+## salesloft.users
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | |
+| email | TEXT | |
+
+## salesloft.account
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | |
+| crm_id | INT | hubspot.company.id |
+| name | TEXT | |
+
 # Important Notes for Querying
 1. Coupon Payments: Unless specified otherwise, exclude payments made with coupons in spend calculations.
 2. Orders Without Line Items: For orders that exist but have no associated line items, assume they're associated with line_item_id = 1. Use COALESCE(oli.line_item_id, 1) when joining with the order_line_items table. When we first launched, we only had one product (our standard plan) and we didn't have a line_items table. Therefore, when you see an order without any associated line items it's safe to assume that it's a standard plan order.
