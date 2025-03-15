@@ -1,0 +1,237 @@
+# Tables
+
+## hubspot.deal
+| Column Name | Type | Joins To | Notes | 
+|------------|------|----------|-------|
+| property_dealname | TEXT | | | 
+| deal_id | INT | hubspot.deal_company.deal_id | | 
+| owner_id | INT | hubspot.owner.owner_id | | 
+| property_lead_source | TEXT | | | 
+| property_createdate | TIMESTAMP | | | 
+| property_hs_closed_won_date | TIMESTAMP | | | 
+| property_demo_booked_by_ | TEXT | | | The name of the SDR that sourced this deal
+| property_hs_closed_amount | FLOAT64 | | Represents the amount of net-new MRR gained when this deal was closed
+
+## hubspot.deal_stage
+| Column Name | Type | Joins To | Notes |
+|-------------|------|----------|-------|
+| deal_id | INT | hubspot.deal.deal_id | |
+| date_entered | TIMESTAMP | | The date and time when the deal entered this stage |
+| value | STRING | | Stage ID |
+
+## hubspot.owner
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| owner_id | INT | hubspot.deal.owner_id |
+| _fivetran_synced | TIMESTAMP | |
+| active_user_id | INT | |
+| created_at | TIMESTAMP | |
+| email | TEXT | |
+| first_name | TEXT | |
+| is_active | BOOLEAN | |
+| last_name | TEXT | |
+| updated_at | TIMESTAMP | |
+
+## salesloft.email
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| user_id | INT | |
+| recipient_id | INT | |
+| sent_at | TIMESTAMP | |
+
+## salesloft.people
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | |
+| account_id | INT | |
+| owner_id | INT | |
+| email_address | TEXT | |
+
+## salesloft.users
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | |
+| email | TEXT | |
+
+## salesloft.account
+| Column Name | Type | Joins To |
+|------------|------|----------|
+| id | INT | |
+| crm_id | INT | hubspot.company.id |
+| name | TEXT | |
+
+## dbt_analytics.customer_recurring_revenue
+| Column Name | Type | Joins To |
+|-------------|------|-------------|
+| dt | DATE | |
+| mth | DATE | |
+| month_end_date | DATE | |
+| customer_id | TEXT | hubspot.company.property_stripe_customer_id |
+| customer_name | TEXT | |
+| customer_domain | TEXT | |
+| product_name | TEXT | |
+| net_arr_calc | NUMERIC | |
+| net_mrr_calc | NUMERIC | |
+
+## hubspot.deal_company
+| Column Name | Type | Joins To |
+|-------------|------|----------|
+| company_id | INT | |
+| deal_id | INT | hubspot.deal.deal_id |
+| _fivetran_synced | TIMESTAMP | |
+| type_id | INT | |
+| category | TEXT | |
+
+## hubspot.company
+| Column Name | Type | Joins To |
+|-------------|------|----------|
+| id | INT | |
+| property_name | TEXT | |
+| property_stripe_customer_id | TEXT | dbt_analytics.customer_recurring_revenue.customer_id |
+
+# Canonical Queries
+
+## Net returns by SDR and Month
+WITH ranked_deals AS (
+  SELECT 
+    dc.company_id,
+    d.deal_id,
+    d.property_createdate,
+    ROW_NUMBER() OVER (PARTITION BY dc.company_id ORDER BY d.property_createdate ASC) AS deal_rank
+  FROM 
+    hubspot.deal_company dc
+  JOIN 
+    hubspot.deal d ON dc.deal_id = d.deal_id
+),
+
+first_deal_by_company as (
+SELECT 
+  company_id,
+  deal_id AS first_deal_id
+FROM 
+  ranked_deals
+WHERE 
+  deal_rank = 1
+ORDER BY 
+  company_id), 
+  
+first_sdr_by_company as (
+  select company_id, first_deal_id, property_demo_booked_by_, property_createdate as deal_created_date
+  from first_deal_by_company 
+  join hubspot.deal  on first_deal_id = deal.deal_id
+  
+  ),
+  
+  first_deal_by_customer as (
+select fdbc.*, company.property_stripe_customer_id
+from first_deal_by_company fdbc
+join hubspot.company on fdbc.company_id = company.id
+),
+
+first_sdr_by_customer as (
+select fsbc.*, company.property_stripe_customer_id
+from first_sdr_by_company fsbc
+join hubspot.company on fsbc.company_id = company.id
+
+), 
+
+
+mrr_by_customer_and_month as (
+SELECT 
+  crr.customer_id,
+  crr.mth AS month,
+  SUM(crr.net_mrr_calc) AS mrr
+FROM 
+  dbt_analytics.customer_recurring_revenue crr
+WHERE 
+  crr.dt = crr.month_end_date
+GROUP BY 1, 2 
+),
+
+
+mrr_by_customer_and_month_with_sdr as (
+select month, property_demo_booked_by_, sum(mrr) as total_mrr
+from mrr_by_customer_and_month
+left join first_sdr_by_customer on mrr_by_customer_and_month.customer_id = first_sdr_by_customer.property_stripe_customer_id
+group by 1, 2
+), 
+
+ sdr_dates AS (
+  SELECT 'Hugh McMackin' AS sdr_name, DATE '2024-02-05' AS start_date, NULL AS stop_date UNION ALL
+  SELECT 'Alex Marshall', DATE '2024-02-15', '2025-01-01' UNION ALL
+  SELECT 'Rob Jones', DATE '2024-02-26', DATE '2024-06-17' UNION ALL
+  SELECT 'Ben Humphreys', DATE '2024-07-08', DATE '2025-02-24' UNION ALL
+  SELECT 'Collin Buckley', DATE '2024-07-22', NULL UNION ALL
+  SELECT 'Mary Kate Cusack', DATE '2024-10-21', DATE '2025-02-17' UNION ALL
+  SELECT 'Bryan Gotti', DATE '2025-02-24', NULL UNION ALL
+  SELECT 'Aidan Demian', DATE '2025-03-03', NULL UNION ALL
+  SELECT 'Michael Dowers', DATE '2025-03-03', NULL UNION ALL
+  SELECT 'Kyle Camposano', DATE '2025-03-03', NULL
+),
+
+months AS (
+  SELECT DISTINCT DATE_TRUNC(DATE_ADD(DATE '2024-02-01', INTERVAL n MONTH), MONTH) AS month
+  FROM UNNEST(GENERATE_ARRAY(0, TIMESTAMP_DIFF(CURRENT_DATE(), DATE '2024-02-01', MONTH))) AS n
+),
+
+expanded_sdrs AS (
+  SELECT 
+    m.month, 
+    s.sdr_name, 
+    6000 AS cost
+  FROM sdr_dates s
+  JOIN months m 
+    ON m.month BETWEEN DATE_TRUNC(s.start_date, MONTH) 
+                   AND COALESCE(DATE_TRUNC(s.stop_date, MONTH), CURRENT_DATE()) -- Handle NULL stop dates up to current month
+),
+
+sdr_costs as (
+SELECT * 
+FROM expanded_sdrs
+ORDER BY month, sdr_name), 
+
+results as (
+
+
+
+select coalesce(property_demo_booked_by_, sdr_name) as sdr_name, coalesce(mrr_by_customer_and_month_with_sdr.month, sdr_costs.month) as month, coalesce(total_mrr, 0)  - coalesce(cost, 0) as net_return 
+from mrr_by_customer_and_month_with_sdr
+full join sdr_costs on (property_demo_booked_by_ = sdr_name and  sdr_costs.month = mrr_by_customer_and_month_with_sdr.month)
+where sdr_name IS NOT NULL
+and property_demo_booked_by_ != ''
+order by coalesce(mrr_by_customer_and_month_with_sdr.month, sdr_costs.month) desc)
+
+select * from results
+where month < date_trunc(CURRENT_DATE, month)
+
+## Net New MRR by SDR and Month
+SELECT
+  FORMAT_TIMESTAMP('%Y-%m', property_hs_closed_won_date) AS month,
+  property_demo_booked_by_ AS SDR,
+  SUM(property_hs_closed_amount) AS total_closed_amount
+FROM
+  hubspot.deal
+WHERE
+  property_hs_closed_won_date IS NOT NULL
+  and property_demo_booked_by_ IS NOT NULL
+  and property_demo_booked_by_ != ''
+GROUP BY
+  1, 2
+ORDER BY
+  1, 2
+
+# Important Notes for Querying
+1. Current AEs: When referring to "current AEs", this means owners with email addresses matthewv@usehatchapp.com, nicholas.wood@usehatchapp.com, and alex.marshall@usehatchapp.com.
+2. Won Deals: A deal is considered 'won' if the property_hs_closed_won_date is not NULL.
+5. Identifying Usage or Overage Revenue: When querying the customer_recurring_revenue table, you can identify "usage" or "overage" revenue by using the following filter:
+   ```sql
+   WHERE lower(product_name) LIKE '%bot%'
+      OR lower(product_name) LIKE '%sms%'
+      OR lower(product_name) LIKE '%ai conversations%'
+      OR lower(product_name) LIKE '%mms%'
+      OR lower(product_name) LIKE '%usage%'
+   ```
+
+   Only exclude this revenue if explicitly told to do so
+6. Monthly Queries: When querying the customer_recurring_revenue table on a monthly basis, use the filter 'WHERE dt = month_end_date' to summing across daily snapshots.
+7. A deal is considered a "Sales Qualified Opportunity" (SQO) if it has entered the deal_stage with value '145109412'. 
