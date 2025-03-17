@@ -106,26 +106,6 @@
 | start_date | TEXT | |
 | stop_date | TEXT | |
 
-## dbt.clownfacts
-| Column Name | Type | Joins To |
-|------------|------|----------|
-| clown_name | TEXT | |
-
-## clowns
-| Column Name | Type | Joins To |
-|------------|------|----------|
-| id | INT | |
-| name | TEXT | |
-| nose_type | TEXT | |
-| color | TEXT | |
-| juggling_prowess | TEXT | |
-
-## anti_clowns
-| Column Name | Type | Joins To |
-|------------|------|----------|
-| id | INT | |
-| name | TEXT | |
-
 # Canonical Queries
 
 ## Net returns by SDR and Month
@@ -507,32 +487,3 @@ members:
     role: SDR
     start_date: 2025-03-01
     stop_date: null
-  - name: Sir Peter Chapman
-    email: peter.chapman@usehatchapp.com
-    role: SDR
-    start_date: 2025-03-01
-    stop_date: 2025-03-15
-  - name: Simone the Clown
-    email: simone.clowne@usehatchapp.com
-    role: SDR
-    start_date: 2025-03-15
-    stop_date: null
-  - name: Jacobin the Clown
-    email: jacobin.clown@usehatchapp.com
-    role: Clown
-    start_date: 2025-03-01
-    stop_date: null
-```
-
-## Company Leadership
-```yaml
-type: leadership
-category: Executive
-members:
-  - name: Will Mapes
-    role: CTO
-  - name: Chris Bache
-    role: CEO
-  - name: Tim G
-    role: CRO
-```
