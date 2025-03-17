@@ -98,14 +98,6 @@
 | property_company_score_clay_ | NUMERIC | |
 | property_crm_clay_ | TEXT | |
 
-## dbt_analytics.sdrs
-| Column Name | Type | Joins To |
-|------------|------|----------|
-| sdr_name | TEXT | |
-| email | TEXT | |
-| start_date | TEXT | |
-| stop_date | TEXT | |
-
 # Canonical Queries
 
 ## Net returns by SDR and Month
