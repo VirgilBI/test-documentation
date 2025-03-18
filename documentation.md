@@ -208,22 +208,3 @@ Each line item corresponds to a product. The line_item_id in the order_line_item
 
 ##Won Deals
 A deal is considered 'won' if the property_hs_closed_won_date is not NULL.
-
-# Facts
-
-## SDR Information
-```yaml
-type: team_members
-category: Sales
-members:
-  - name: Liza McBride
-    email: liza.mcbride@jaffleshop.com
-    role: SDR
-    start_date: 2024-02-05
-    stop_date: null
-  - name: Sam Sander
-    email: sam.sanders@jaffleshop.com
-    role: AE
-    start_date: 2024-02-15
-    stop_date: 2025-01-01
-  
