@@ -206,5 +206,8 @@ For orders that exist but have no associated line items, assume they're associat
 ## Line Items and Products
 Each line item corresponds to a product. The line_item_id in the order_line_items table represents a specific product.
 
-##Won Deals
+## Won Deals
 A deal is considered 'won' if the property_hs_closed_won_date is not NULL.
+
+## Test Users
+A test user is any user with billable = FALSE. Test users should be excluded from queries about users unless specifically requested.
