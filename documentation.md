@@ -96,3 +96,6 @@ For orders that exist but have no associated line items, assume they're associat
 
 ## Line Items and Products
 Each line item corresponds to a product. The line_item_id in the order_line_items table represents a specific product.
+
+## Revenue Calculation
+When calculating revenue, only include revenue from orders where the status is not 'returned' or 'return_pending'.
