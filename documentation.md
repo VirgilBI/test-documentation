@@ -38,46 +38,24 @@
 | billing_id | INT | |
 | billable_status | BOOL | |
 
-## hubspot.deal
-| Column Name | Type | Joins To | Notes | 
-|------------|------|----------|-------|
-| property_dealname | TEXT | | | 
-| deal_id | INT | hubspot.deal_company.deal_id | | 
-| owner_id | INT | hubspot.owner.owner_id | | 
-| property_lead_source | TEXT | | | 
-| property_createdate | TIMESTAMP | | | 
-| property_hs_closed_won_date | TIMESTAMP | | | 
-| property_demo_booked_by_ | TEXT | | The name of the SDR that sourced this deal
-| property_hs_closed_amount | FLOAT64 | | Represents the amount of net-new MRR gained when this deal was closed
-| property_hs_created_by_user_id | FLOAT64 | | |
 
-## hubspot.deal_stage
-| Column Name | Type | Joins To | Notes |
-|-------------|------|----------|-------|
-| deal_id | INT | hubspot.deal.deal_id | |
-| date_entered | TIMESTAMP | | The date and time when the deal entered this stage |
-| value | STRING | | Stage ID |
-
-## hubspot.owner
-| Column Name | Type | Joins To |
-|------------|------|----------|
-| owner_id | INT | hubspot.deal.owner_id |
-| _fivetran_synced | TIMESTAMP | |
-| active_user_id | INT | |
-| created_at | TIMESTAMP | |
-| email | TEXT | |
-| first_name | TEXT | |
-| is_active | BOOLEAN | |
-| last_name | TEXT | |
-| updated_at | TIMESTAMP | |
-
-## hubspot.users
-| Column Name | Type | Joins To |
-|------------|------|----------|
-| id | INT | |
-| email | TEXT | |
 
 # Canonical Queries
+
+## Orders by Product
+SELECT 
+  DATE_TRUNC('month', o.order_date) AS month,
+  COUNT(COALESCE(oli.line_item_id, 1)) AS items_sold
+FROM 
+  jaffle_shop.orders o
+LEFT JOIN 
+  jaffle_shop.order_line_items oli ON o.id = oli.order_id
+WHERE 
+  o.status = 'completed' -- Assuming we only want completed orders
+GROUP BY 
+  1
+ORDER BY 
+  1;
   
 ## Net returns by SDR and Month
 WITH ranked_deals AS (
@@ -90,94 +68,7 @@ WITH ranked_deals AS (
     hubspot.deal_company dc
   JOIN 
     hubspot.deal d ON dc.deal_id = d.deal_id
-),
-
-first_deal_by_company as (
-SELECT 
-  company_id,
-  deal_id AS first_deal_id
-FROM 
-  ranked_deals
-WHERE 
-  deal_rank = 1
-ORDER BY 
-  company_id), 
-  
-first_sdr_by_company as (
-  select company_id, first_deal_id, property_demo_booked_by_, property_createdate as deal_created_date
-  from first_deal_by_company 
-  join hubspot.deal  on first_deal_id = deal.deal_id
-  
-  ),
-  
-  first_deal_by_customer as (
-select fdbc.*, company.property_stripe_customer_id
-from first_deal_by_company fdbc
-join hubspot.company on fdbc.company_id = company.id
-),
-
-first_sdr_by_customer as (
-select fsbc.*, company.property_stripe_customer_id
-from first_sdr_by_company fsbc
-join hubspot.company on fsbc.company_id = company.id
-
-), 
-
-
-mrr_by_customer_and_month as (
-SELECT 
-  crr.customer_id,
-  crr.mth AS month,
-  SUM(crr.net_mrr_calc) AS mrr
-FROM 
-  dbt_analytics.customer_recurring_revenue crr
-WHERE 
-  crr.dt = crr.month_end_date
-GROUP BY 1, 2 
-),
-
-
-mrr_by_customer_and_month_with_sdr as (
-select month, property_demo_booked_by_, sum(mrr) as total_mrr
-from mrr_by_customer_and_month
-left join first_sdr_by_customer on mrr_by_customer_and_month.customer_id = first_sdr_by_customer.property_stripe_customer_id
-group by 1, 2
-), 
-
-months AS (
-  SELECT DISTINCT DATE_TRUNC(DATE_ADD(DATE '2024-02-01', INTERVAL n MONTH), MONTH) AS month
-  FROM UNNEST(GENERATE_ARRAY(0, TIMESTAMP_DIFF(CURRENT_DATE(), DATE '2024-02-01', MONTH))) AS n
-),
-
-expanded_sdrs AS (
-  SELECT 
-    m.month, 
-    s.sdr_name, 
-    6000 AS cost
-  FROM sdr_dates s
-  JOIN months m 
-    ON m.month BETWEEN DATE_TRUNC(s.start_date, MONTH) 
-                   AND COALESCE(DATE_TRUNC(s.stop_date, MONTH), CURRENT_DATE()) -- Handle NULL stop dates up to current month
-),
-
-sdr_costs as (
-SELECT * 
-FROM expanded_sdrs
-ORDER BY month, sdr_name), 
-
-results as (
-
-
-
-select coalesce(property_demo_booked_by_, sdr_name) as sdr_name, coalesce(mrr_by_customer_and_month_with_sdr.month, sdr_costs.month) as month, coalesce(total_mrr, 0)  - coalesce(cost, 0) as net_return 
-from mrr_by_customer_and_month_with_sdr
-full join sdr_costs on (property_demo_booked_by_ = sdr_name and  sdr_costs.month = mrr_by_customer_and_month_with_sdr.month)
-where sdr_name IS NOT NULL
-and property_demo_booked_by_ != ''
-order by coalesce(mrr_by_customer_and_month_with_sdr.month, sdr_costs.month) desc)
-
-select * from results
-where month < date_trunc(CURRENT_DATE, month)
+)
 
 ## Net New MRR by SDR and Month
 SELECT
@@ -205,6 +96,3 @@ For orders that exist but have no associated line items, assume they're associat
 
 ## Line Items and Products
 Each line item corresponds to a product. The line_item_id in the order_line_items table represents a specific product.
-
-##Won Deals
-A deal is considered 'won' if the property_hs_closed_won_date is not NULL.
