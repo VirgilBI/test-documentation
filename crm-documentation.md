@@ -393,13 +393,13 @@ SELECT * FROM results WHERE date_first_sdr_emailed > first_sdr_deal_date
 
 # Important Notes for Querying
 
-##Current AEs
+## Current AEs
 When referring to "current AEs", this means owners with email addresses matthewv@usehatchapp.com, nicholas.wood@usehatchapp.com, and alex.marshall@usehatchapp.com.
 
-##Won Deals
+## Won Deals
 A deal is considered 'won' if the property_hs_closed_won_date is not NULL.
 
-##Identifying Usage or Overage Revenue
+## Identifying Usage or Overage Revenue
 When querying the customer_recurring_revenue table, you can identify "usage" or "overage" revenue by using the following filter:
    ```sql
    WHERE lower(product_name) LIKE '%bot%'
@@ -411,10 +411,10 @@ When querying the customer_recurring_revenue table, you can identify "usage" or 
 
    Only exclude this revenue if explicitly told to do so
    
-##Monthly Queries
+## Monthly Queries
 When querying the customer_recurring_revenue table on a monthly basis, use the filter 'WHERE dt = month_end_date' to summing across daily snapshots.
 
-##SQOs
+## SQOs
 A deal is considered a "Sales Qualified Opportunity" (SQO) if it has entered the deal_stage with value '145109412'.
 
 # Facts
