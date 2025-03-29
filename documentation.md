@@ -479,3 +479,16 @@ members:
     role: SDR
     start_date: 2025-03-01
     stop_date: null
+
+## Analysis Dimensions
+```yaml
+type: analysis_dimensions
+category: Sales Performance
+dimensions:
+  - name: SDR and Month
+    applicable_metrics:
+      - Sales Qualified Opportunities (SQOs)
+      - MRR
+      - Deal Count
+    description: SDR and month are potential dimensions for analyzing Sales Qualified Opportunities (SQOs) and other sales metrics
+```
