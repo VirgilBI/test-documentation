@@ -1,6 +1,6 @@
 # Tables
 
-## hubspot.deal
+## hubspot_deals
 | Column Name | Type | Joins To | Notes | 
 |------------|------|----------|-------|
 | property_dealname | TEXT | | | 
