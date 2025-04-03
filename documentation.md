@@ -417,6 +417,9 @@ When querying the customer_recurring_revenue table on a monthly basis, use the f
 ## SQOs
 A deal is considered a "Sales Qualified Opportunity" (SQO) if it has entered the deal_stage with value '145109412'.
 
+## Historical Data Limitations
+The field property_hs_closed_amount was not used consistently prior to 2022 and should be excluded from queries before that year.
+
 # Facts
 
 ## SDR Information
@@ -479,3 +482,4 @@ members:
     role: SDR
     start_date: 2025-03-01
     stop_date: null
+```
