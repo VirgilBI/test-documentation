@@ -420,6 +420,9 @@ A deal is considered a "Sales Qualified Opportunity" (SQO) if it has entered the
 ## Historical Data Limitations
 The field property_hs_closed_amount was not used consistently prior to 2022 and should be excluded from queries before that year.
 
+## Query Optimization
+Using indexes on frequently queried columns can significantly improve query performance.
+
 # Facts
 
 ## SDR Information
