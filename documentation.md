@@ -423,6 +423,9 @@ The field property_hs_closed_amount was not used consistently prior to 2022 and 
 ## Query Optimization
 Using indexes on frequently queried columns can significantly improve query performance.
 
+## Fiscal Year
+The fiscal year starts in February.
+
 # Facts
 
 ## SDR Information
