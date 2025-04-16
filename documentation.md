@@ -420,9 +420,6 @@ A deal is considered a "Sales Qualified Opportunity" (SQO) if it has entered the
 ## Historical Data Limitations
 The field property_hs_closed_amount was not used consistently prior to 2022 and should be excluded from queries before that year.
 
-## Query Optimization
-Using indexes on frequently queried columns can significantly improve query performance.
-
 ## BigQuery Date Functions Limitations
 - DATE_ADD function in BigQuery does not support the MONTH date part when the argument is a TIMESTAMP type.
 - When performing date additions in BigQuery with TIMESTAMP values, you must first convert the TIMESTAMP to a DATE type if you need to add months, or use alternative functions like DATE_ADD(CAST(timestamp_value AS DATE), INTERVAL n MONTH).
