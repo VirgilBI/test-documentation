@@ -393,6 +393,9 @@ SELECT * FROM results WHERE date_first_sdr_emailed > first_sdr_deal_date
 
 # Important Notes for Querying
 
+## Fiscal Year
+The company's fiscal year starts in February.
+
 ## Current AEs
 When referring to "current AEs", this means owners with email addresses matthewv@usehatchapp.com, nicholas.wood@usehatchapp.com, and alex.marshall@usehatchapp.com.
 
