@@ -16,7 +16,7 @@
 ## hubspot.deal_stage
 | Column Name | Type | Joins To | Notes |
 |-------------|------|----------|-------|
-| deal_id | INT | hubspot.deal.deal_id | |
+| deal_id | INT | hubspot.deal.deal_id | the deal's id |
 | date_entered | TIMESTAMP | | The date and time when the deal entered this stage |
 | value | STRING | | Stage ID |
 
