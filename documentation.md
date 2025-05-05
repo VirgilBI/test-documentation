@@ -3,7 +3,7 @@
 ## hubspot.deal
 | Column Name | Type | Joins To | Notes | 
 |------------|------|----------|-------|
-| property_dealname | TEXT | | | 
+| property_dealname | TEXT | | | this is a new note
 | deal_id | INT | hubspot.deal_company.deal_id | | 
 | owner_id | INT | hubspot.owner.owner_id | | 
 | property_lead_source | TEXT | | | 
